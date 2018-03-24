@@ -1,0 +1,365 @@
+---
+output:
+  revealjs::revealjs_presentation:
+    css: ./css/revealOpts.css
+    center: no
+    theme: solarized
+    self_contained: no
+    transition: slide
+---
+
+```{r include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(
+  echo = FALSE
+  , message = FALSE
+)
+```
+
+# Linear Blues
+
+## What do these things have in common?
+
+##
+
+> - Amy Winehouse - Rehab
+> - U2 - Still Haven't Found What I'm Looking For
+> - Tracy Chapman - Give Me One Reason
+> - Prince - Purple Rain
+> - The Clash - Should I Stay or Should I Go?
+> - KC & The Sunshine Band - Boogie Shoes
+> - Steelers Wheel - Stuck in the Middle With You
+> - Pink Floyd - Money
+> - Led Zeppelin - Rock and Roll
+> - James Brown - I Got You (I Feel Good)
+> - The Beatles - Can't Buy Me Love
+> - Johnny Cash - Folsom Prison Blues
+> - Miles Davis - All Blues
+> - Chuck Berry - Johnny B. Goode
+> - Robert Johnson - Sweet Home Chicago
+
+## The pattern
+
+```{r }
+munge_blues <- function(tbl) {
+  tbl %>% 
+    tidyr::gather(bar, chord, -row) %>% 
+    mutate(bar = gsub('bar_', "", bar))
+}
+
+plt_blues <- function(tbl) {
+  tbl %>% 
+    ggplot(aes(bar, row)) +
+    geom_tile(aes(fill = chord), color = 'grey') + 
+    geom_text(aes(label = chord), color = 'white', size = 10) +
+    theme_void() + 
+    theme(
+      legend.position = 'none'
+    ) +
+    scale_y_reverse() +
+    scale_fill_manual(values = c('#0000FF', '#CC8614', '#7914CC'))
+}
+```
+
+```{r}
+tbl_blues <- tribble(
+  ~row, ~bar_1, ~bar_2, ~bar_3, ~bar_4
+  , 1 , 'I', 'I', 'I', 'I'
+  , 2 , 'IV', 'IV', 'I', 'I'
+  , 3 , 'V', 'V', 'I', 'I'
+) %>% 
+  munge_blues()
+tbl_blues %>% 
+  plt_blues()
+```
+
+## The variations
+
+```{r}
+tribble(
+  ~row, ~bar_1, ~bar_2, ~bar_3, ~bar_4
+  , 1 , 'I', 'I', 'I', 'I'
+  , 2 , 'IV', 'IV', 'I', 'I'
+  , 3 , 'V', 'IV', 'I', 'I'
+) %>% 
+  munge_blues() %>% 
+  plt_blues()
+```
+
+## The variations
+
+```{r}
+tribble(
+  ~row, ~bar_1, ~bar_2, ~bar_3, ~bar_4
+  , 1 , 'I', 'I', 'I', 'I'
+  , 2 , 'IV', 'IV', 'I', 'I'
+  , 3 , 'V', 'IV', 'I', 'V'
+) %>% 
+  munge_blues() %>% 
+  plt_blues()
+```
+
+# The linear pattern
+
+## The linear pattern
+
+<div class='big-math'>
+$$\mu_i=\beta_0 + \sum_{j=1}^{p}{(\beta_j * x_{ij})}+\epsilon_i$$
+</div>
+
+## The linear pattern
+
+<div class='big-math'>
+$$\mu_i=\beta_0 + \sum_{j=1}^{p}{(\beta_j * x_{ij})}+\epsilon_i$$
+</div>
+
+_i_ -> sample point
+
+_j_ -> predictor
+
+$E[\epsilon_i]=0$
+
+$Var[\epsilon_i]=\sigma$
+
+$Cov(\epsilon_i,\epsilon_j)=0, \forall i \neq j$
+
+## Variations
+
+<div class='big-math'>
+$$\epsilon_i=\mu_i - \beta_0 - \sum_{j=1}^{p}{(\beta_j * x_{ij})}$$
+</div>
+
+## Variation
+
+Knowing that $E[\epsilon_i]=0$, we can presume normality and use maximum likelihood to estimate $\sigma$. 
+
+We just need to use values of $\beta_0$ and $\beta_j$ that will get $\epsilon$ close to zero.
+
+Let's assume that we've done that. (More on this point later.)
+
+## Original Data
+
+```{r }
+set.seed(123)
+sims <- 500
+b_0 <- 10
+b_1 <- 1.5
+tbl_linear <- tibble(
+    x = runif(sims, 10, 20)
+  , e = rnorm(sims, 0, 1) 
+) %>% 
+  mutate(
+    y = b_0 + b_1 * x + e
+  )
+```
+
+```{r }
+tbl_linear %>% 
+  ggplot(aes(x, y)) + 
+  geom_point()
+```
+
+## Subtract $\sum_{j=1}^{p}{(\beta_j * x_{ij})}$
+
+```{r}
+fit <- lm(y ~ 1 + x, data = tbl_linear)
+b_0_fit <- coef(fit)[1]
+b_1_fit <- coef(fit)[2]
+tbl_linear <- tbl_linear %>% 
+  mutate(
+    y_adj = y - b_1_fit * x
+  )
+```
+
+```{r}
+tbl_linear %>% 
+  ggplot(aes(x, y_adj)) + 
+  geom_point()
+```
+
+## Subtract intercept
+
+```{r}
+tbl_linear <- tbl_linear %>% 
+  mutate(
+      y_adj = y_adj - b_0_fit
+    , y_adj_2 = y - b_0 - b_1 * x
+  )
+
+tbl_linear %>% 
+  ggplot(aes(x, y_adj)) + 
+  geom_point()
+```
+
+## We're seeking noise
+
+We presume that the observation is a linear transform of a random variable. 
+
+We've assumed a normal distribution, but do we have to?
+
+## Logistic
+
+$$\epsilon_i \text{~} ~ logistic(0,1)$$
+
+$$z_i=\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}+\epsilon_i$$
+
+$$y_i =
+  \begin{cases}
+    1  & \text{if } z_i > 0 \\
+    0  & \text{if } z_i < 0
+  \end{cases}$$
+
+##
+
+```{r echo=TRUE}
+tbl_logistic <- tibble( 
+    e = rlogis(sims)
+  , x = runif(sims, -10, 10)
+) %>% 
+  mutate(
+      latent = b_0 + b_1 * x + e
+    , y = as.integer(latent > 0)
+  )
+```
+
+##
+
+```{r }
+tbl_logistic %>% 
+  ggplot(aes(x, y)) + 
+  geom_point()
+```
+
+##
+
+```{r }
+tbl_logistic %>% 
+  ggplot(aes(x, y)) + 
+  geom_point() + 
+  geom_smooth(method = glm,  method.args = list(family = "binomial"))
+```
+
+## The process
+
+So we can use the **same** process to create a logistic regression!
+
+1. Random noise -> 
+2. Linear transform -> 
+3. Transform that result (optional) ->
+4. Observation
+
+Gaussian and logistic are the only two distributions that I know of where we can get away with this. For other distributions ...
+
+## The process in (sort of) reverse
+
+Rather than assuming we start with noise and transform it, let's start with (a function of) the observation.
+
+$$E[Y_i]=\mu_i=\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}$$
+
+We lost $\epsilon$ !
+
+But we're still using maximum likelihood. There's a distribution in there.
+
+## Poisson
+
+```{r}
+sims <- 50e3
+tbl_poisson <- tibble(
+  x = sample(100:1000, size = sims, replace = TRUE)
+) %>% 
+  mutate(
+      mojo = b_0 + b_1 * x 
+    # , mojo = log(mojo)
+    , y = rpois(sims, mojo)
+  )
+```
+
+```{r}
+tbl_poisson %>% 
+  ggplot(aes(x, y)) +
+  geom_hex()
+```
+
+# Speaking of maximum likelihood
+
+# Must we use a distribution?
+
+## Regularization
+
+##
+
+* Ridges reduces
+* Lasso liminates
+
+# All the other stuff I didn't cover
+
+## There's so much more!
+
+* Data pre-processing
+    * Polynomial
+    * Log
+    * Centering
+    * Other
+
+# Wrapping up
+
+## What do these things have in common?
+
+- Amy Winehouse - Rehab
+- U2 - Still Haven't Found What I'm Looking For
+- Tracy Chapman - Give Me One Reason
+- Prince - Purple Rain
+- The Clash - Should I Stay or Should I Go?
+- KC & The Sunshine Band - Boogie Shoes
+- Steelers Wheel - Stuck in the Middle With You
+- Pink Floyd - Money
+- Led Zeppelin - Rock and Roll
+- James Brown - I Got You (I Feel Good)
+- The Beatles - Can't Buy Me Love
+- Johnny Cash - Folsom Prison Blues
+- Miles Davis - All Blues
+- Chuck Berry - Johnny B. Goode
+- Robert Johnson - Sweet Home Chicago
+
+## What do these things have in common?
+
+* OLS
+* GLM
+    * Logistic
+    * Poisson
+    * Tweedie
+* Time series
+* Regularization
+* Lasso
+
+##
+
+$$\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}$$
+
+## What do these things have in common?
+
+* Distributional assumption
+* Linear combination of (transformed) predictors
+* Performance assessment of predictors
+    * Hypothesis tests
+    * Stepwise regression
+    * 
+* Tests of model fit
+    * AIC
+* Testable statistical hypotheses
+    * Distributional form
+    * Independent error terms
+    * Predictor significance
+* Assessment of residuals
+
+##
+
+> "...magical dreamlike logic"
+
+## Thank you!
+
+## References
+
+* pirategrunt.com/linear_blues/
+* https://musiciantuts.com/12-bar-blues-songs/
+* http://the12barbluesaframework.blogspot.com/2009/04/introduction-to-12-bar-blues.html
