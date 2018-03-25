@@ -12,7 +12,7 @@ munge_blues <- function(tbl) {
 plt_blues <- function(tbl) {
   tbl %>% 
     ggplot(aes(bar, row)) +
-    geom_tile(aes(fill = chord), color = 'grey') + 
+    geom_tile(aes(fill = chord), color = 'white') + 
     geom_text(aes(label = chord), color = 'white', size = 10) +
     theme_void() + 
     theme(
@@ -52,7 +52,7 @@ b_0 <- 10
 b_1 <- 1.5
 tbl_linear <- tibble(
     x = runif(sims, 10, 20)
-  , e = rnorm(sims, 0, 1) 
+  , e = rnorm(sims, 0, 2) 
 ) %>% 
   mutate(
     y = b_0 + b_1 * x + e
@@ -60,6 +60,20 @@ tbl_linear <- tibble(
 tbl_linear %>% 
   ggplot(aes(x, y)) + 
   geom_point()
+eval_epsilon <- function(parms) {
+  est_epsilon <- tbl_linear %>% 
+    mutate(est_epsilon = y - parms[1] - parms[2] * x) %>% 
+    pull(est_epsilon)
+  est_epsilon^2  %>% mean()
+}
+
+fits <- optim(
+    par = c(10, 1.5)
+  , eval_epsilon
+)
+fits
+
+eval_epsilon(fits$par)
 fit <- lm(y ~ 1 + x, data = tbl_linear)
 b_0_fit <- coef(fit)[1]
 b_1_fit <- coef(fit)[2]
@@ -79,6 +93,12 @@ tbl_linear <- tbl_linear %>%
 tbl_linear %>% 
   ggplot(aes(x, y_adj)) + 
   geom_point()
+tbl_linear %>% 
+  ggplot(aes(x, y)) + 
+  geom_point()
+tbl_linear %>% 
+  ggplot(aes(x, y_adj)) + 
+  geom_point()
 tbl_logistic <- tibble( 
     e = rlogis(sims)
   , x = runif(sims, -10, 10)
@@ -94,15 +114,22 @@ tbl_logistic %>%
   ggplot(aes(x, y)) + 
   geom_point() + 
   geom_smooth(method = glm,  method.args = list(family = "binomial"))
-sims <- 50e3
+fit_logistic <- glm(
+  y ~ 1 + x
+  , data = tbl_logistic
+  , family = binomial
+)
+summary(fit_logistic)
+sims <- 5e3
 tbl_poisson <- tibble(
   x = sample(100:1000, size = sims, replace = TRUE)
 ) %>% 
   mutate(
-      mojo = b_0 + b_1 * x 
-    # , mojo = log(mojo)
-    , y = rpois(sims, mojo)
+      eta = b_0 + b_1 * x 
+    , y = rpois(sims, eta)
   )
 tbl_poisson %>% 
   ggplot(aes(x, y)) +
   geom_hex()
+fit <- glm(y ~ 1 + x, data = tbl_poisson, family=poisson(link='identity'))
+summary(fit)

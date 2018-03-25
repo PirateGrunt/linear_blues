@@ -18,6 +18,10 @@ knitr::opts_chunk$set(
 
 # Linear Blues
 
+##
+
+> "...magical dreamlike logic ..."
+
 ## What do these things have in common?
 
 ##
@@ -50,7 +54,7 @@ munge_blues <- function(tbl) {
 plt_blues <- function(tbl) {
   tbl %>% 
     ggplot(aes(bar, row)) +
-    geom_tile(aes(fill = chord), color = 'grey') + 
+    geom_tile(aes(fill = chord), color = 'white') + 
     geom_text(aes(label = chord), color = 'white', size = 10) +
     theme_void() + 
     theme(
@@ -135,9 +139,11 @@ Knowing that $E[\epsilon_i]=0$, we can presume normality and use maximum likelih
 
 We just need to use values of $\beta_0$ and $\beta_j$ that will get $\epsilon$ close to zero.
 
-Let's assume that we've done that. (More on this point later.)
+Let's assume that we've done that.
 
 ## Original Data
+
+$\beta_0$ = 10, $\beta_1$ = 1.5
 
 ```{r }
 set.seed(123)
@@ -146,17 +152,36 @@ b_0 <- 10
 b_1 <- 1.5
 tbl_linear <- tibble(
     x = runif(sims, 10, 20)
-  , e = rnorm(sims, 0, 1) 
+  , e = rnorm(sims, 0, 2) 
 ) %>% 
   mutate(
     y = b_0 + b_1 * x + e
   )
 ```
 
-```{r }
+```{r fig.height=5}
 tbl_linear %>% 
   ggplot(aes(x, y)) + 
   geom_point()
+```
+
+## Determine 
+
+```{r}
+eval_epsilon <- function(parms) {
+  est_epsilon <- tbl_linear %>% 
+    mutate(est_epsilon = y - parms[1] - parms[2] * x) %>% 
+    pull(est_epsilon)
+  est_epsilon^2  %>% mean()
+}
+
+fits <- optim(
+    par = c(10, 1.5)
+  , eval_epsilon
+)
+fits
+
+eval_epsilon(fits$par)
 ```
 
 ## Subtract $\sum_{j=1}^{p}{(\beta_j * x_{ij})}$
@@ -191,6 +216,24 @@ tbl_linear %>%
   geom_point()
 ```
 
+##
+
+<div class='left'>
+```{r }
+tbl_linear %>% 
+  ggplot(aes(x, y)) + 
+  geom_point()
+```
+</div>
+
+<div class='right'>
+```{r}
+tbl_linear %>% 
+  ggplot(aes(x, y_adj)) + 
+  geom_point()
+```
+</div>
+
 ## We're seeking noise
 
 We presume that the observation is a linear transform of a random variable. 
@@ -211,7 +254,7 @@ $$y_i =
 
 ##
 
-```{r echo=TRUE}
+```{r echo=FALSE}
 tbl_logistic <- tibble( 
     e = rlogis(sims)
   , x = runif(sims, -10, 10)
@@ -222,13 +265,17 @@ tbl_logistic <- tibble(
   )
 ```
 
-##
-
 ```{r }
 tbl_logistic %>% 
   ggplot(aes(x, y)) + 
   geom_point()
 ```
+
+## How do we fit this with a linear model?
+
+$$f(x)=\frac{exp(x)}{exp(x) + 1}$$
+
+So, just take $\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}$ and transform it.
 
 ##
 
@@ -237,6 +284,20 @@ tbl_logistic %>%
   ggplot(aes(x, y)) + 
   geom_point() + 
   geom_smooth(method = glm,  method.args = list(family = "binomial"))
+```
+
+##
+
+```{r}
+fit_logistic <- glm(
+  y ~ 1 + x
+  , data = tbl_logistic
+  , family = binomial
+)
+```
+
+```{r }
+summary(fit_logistic)
 ```
 
 ## The process
@@ -250,27 +311,24 @@ So we can use the **same** process to create a logistic regression!
 
 Gaussian and logistic are the only two distributions that I know of where we can get away with this. For other distributions ...
 
-## The process in (sort of) reverse
+## We don't really start with noise
 
-Rather than assuming we start with noise and transform it, let's start with (a function of) the observation.
+Rather than assuming we start with noise which is transformed, we start with the observation. This is reality. 
 
 $$E[Y_i]=\mu_i=\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}$$
 
-We lost $\epsilon$ !
-
-But we're still using maximum likelihood. There's a distribution in there.
+We lost $\epsilon$. Early uses of linear models were very focused on this, because $\epsilon$ captured _measurement error_.
 
 ## Poisson
 
 ```{r}
-sims <- 50e3
+sims <- 5e3
 tbl_poisson <- tibble(
   x = sample(100:1000, size = sims, replace = TRUE)
 ) %>% 
   mutate(
-      mojo = b_0 + b_1 * x 
-    # , mojo = log(mojo)
-    , y = rpois(sims, mojo)
+      eta = b_0 + b_1 * x 
+    , y = rpois(sims, eta)
   )
 ```
 
@@ -280,28 +338,74 @@ tbl_poisson %>%
   geom_hex()
 ```
 
-# Speaking of maximum likelihood
+## How do we assess coefficients?
+
+Earlier, we synthesized data. So, we knew exactly which coefficients generated the observations. Now what?
+
+## For a GLM
+
+$$\frac{\partial{l(y;\beta)}}{\partial\beta_j}=\sum_{i=1}^n{\frac{(y_i-\mu_i)x_{ij}}{a_i(\phi)b''(\theta_i)g'(\mu_i)}}$$
+
+## Poisson
+
+$$\sum_{i=1}^{n}{(y_i-\mu_i)x_{ij}}$$
+
+BUT
+
+$$\mu_i=\beta_0+\sum{\beta_jx_{ij}}$$
+
+## 
+
+$$\sum_{i=1}^{n}{(y_i-\beta_0+\beta_jx_{ij})x_{ij}}$$
+
+## Does my coefficient explain my data?
+
+```{r}
+fit <- glm(y ~ 1 + x, data = tbl_poisson, family=poisson(link='identity'))
+summary(fit)
+```
+
 
 # Must we use a distribution?
 
-## Regularization
+## Short answer
+
+>- No
+
+## Long answer
+
+Gauss, Galton and Legendre were (mostly) uninterested in presuming a functional form $\therefore$ least squares estimation. 
+
+Compare with Buhlmann and origins of credibility.
+
+## Regularization - Lasso
+
+$$RSS(\lambda, c)=\sum_{i=1}^n{(y_i-\hat{y_i})^2}+\lambda\sum_{j=1}^p{|c_j|}$$
+
+Lasso - 
+
+## Ridge
+
+$$RSS(\lambda, c)=\sum_{i=1}^n{(y_i-\hat{y_i})^2}+\lambda\sum_{j=1}^p{c_j^2}$$
 
 ##
 
 * Ridges reduces
 * Lasso liminates
 
-# All the other stuff I didn't cover
+# Wrapping up
 
-## There's so much more!
+## All the other stuff I didn't mention
 
+* **Hierearchical Models!!**
 * Data pre-processing
     * Polynomial
     * Log
     * Centering
     * Other
-
-# Wrapping up
+* Time series
+* Heteroskedasticity
+* Stochastic coefficients --> Chain Ladder loss reserving!!
 
 ## What do these things have in common?
 
@@ -338,23 +442,14 @@ $$\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}$$
 
 ## What do these things have in common?
 
-* Distributional assumption
 * Linear combination of (transformed) predictors
+* Distributional assumption
 * Performance assessment of predictors
-    * Hypothesis tests
-    * Stepwise regression
-    * 
-* Tests of model fit
-    * AIC
 * Testable statistical hypotheses
     * Distributional form
     * Independent error terms
     * Predictor significance
 * Assessment of residuals
-
-##
-
-> "...magical dreamlike logic"
 
 ## Thank you!
 
@@ -363,3 +458,6 @@ $$\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}$$
 * pirategrunt.com/linear_blues/
 * https://musiciantuts.com/12-bar-blues-songs/
 * http://the12barbluesaframework.blogspot.com/2009/04/introduction-to-12-bar-blues.html
+* McCullough and Nelder
+* Curtis Gary Dean
+* R in a Nutshell

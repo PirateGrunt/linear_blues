@@ -10,43 +10,6 @@
   <link rel="stylesheet" href="index_files/reveal.js-3.3.0.1/css/reveal.css"/>
 
 
-<style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-</style>
 
 <link rel="stylesheet" href="index_files/reveal.js-3.3.0.1/css/theme/solarized.css" id="theme">
 
@@ -96,7 +59,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
     <style type="text/css">code{white-space: pre;}</style>
 
-    <link rel="stylesheet" href="css\revealOpts.css"/>
+    <link rel="stylesheet" href="css/revealOpts.css"/>
 
 <!-- Printing and PDF exports -->
 <script id="paper-css" type="application/dynamic-css">
@@ -486,9 +449,14 @@ document.getElementsByTagName('head')[0].appendChild(style);
     <div class="slides">
 
 
-<section><section id="linear-blues" class="titleslide slide level1"><h1>Linear Blues</h1></section><section id="what-do-these-things-have-in-common" class="slide level2">
+<section><section id="linear-blues" class="titleslide slide level1"><h1>Linear Blues</h1></section><section id="section" class="slide level2">
+<h2></h2>
+<blockquote>
+<p>“…magical dreamlike logic …”</p>
+</blockquote>
+</section><section id="what-do-these-things-have-in-common" class="slide level2">
 <h2>What do these things have in common?</h2>
-</section><section id="section" class="slide level2">
+</section><section id="section-1" class="slide level2">
 <h2></h2>
 <ul>
 <li class="fragment">Amy Winehouse - Rehab</li>
@@ -541,16 +509,43 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <h2>Variation</h2>
 <p>Knowing that <span class="math inline">\(E[\epsilon_i]=0\)</span>, we can presume normality and use maximum likelihood to estimate <span class="math inline">\(\sigma\)</span>.</p>
 <p>We just need to use values of <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_j\)</span> that will get <span class="math inline">\(\epsilon\)</span> close to zero.</p>
-<p>Let’s assume that we’ve done that. (More on this point later.)</p>
+<p>Let’s assume that we’ve done that.</p>
 </section><section id="original-data" class="slide level2">
 <h2>Original Data</h2>
+<p><span class="math inline">\(\beta_0\)</span> = 10, <span class="math inline">\(\beta_1\)</span> = 1.5</p>
 <p><img src="index_files/figure-revealjs/unnamed-chunk-7-1.png" width="768" /></p>
+</section><section id="determine" class="slide level2">
+<h2>Determine</h2>
+<pre><code>## $par
+## [1] 9.910613 1.508896
+## 
+## $value
+## [1] 4.034552
+## 
+## $counts
+## function gradient 
+##       51       NA 
+## 
+## $convergence
+## [1] 0
+## 
+## $message
+## NULL</code></pre>
+<pre><code>## [1] 4.034552</code></pre>
 </section><section id="subtract-sum_j1pbeta_j-x_ij" class="slide level2">
 <h2>Subtract <span class="math inline">\(\sum_{j=1}^{p}{(\beta_j * x_{ij})}\)</span></h2>
-<p><img src="index_files/figure-revealjs/unnamed-chunk-9-1.png" width="768" /></p>
+<p><img src="index_files/figure-revealjs/unnamed-chunk-10-1.png" width="768" /></p>
 </section><section id="subtract-intercept" class="slide level2">
 <h2>Subtract intercept</h2>
-<p><img src="index_files/figure-revealjs/unnamed-chunk-10-1.png" width="768" /></p>
+<p><img src="index_files/figure-revealjs/unnamed-chunk-11-1.png" width="768" /></p>
+</section><section id="section-2" class="slide level2">
+<h2></h2>
+<div class="left">
+<p><img src="index_files/figure-revealjs/unnamed-chunk-12-1.png" width="768" /></p>
+</div>
+<div class="right">
+<p><img src="index_files/figure-revealjs/unnamed-chunk-13-1.png" width="768" /></p>
+</div>
 </section><section id="were-seeking-noise" class="slide level2">
 <h2>We’re seeking noise</h2>
 <p>We presume that the observation is a linear transform of a random variable.</p>
@@ -564,22 +559,40 @@ document.getElementsByTagName('head')[0].appendChild(style);
     1  &amp; \text{if } z_i &gt; 0 \\
     0  &amp; \text{if } z_i &lt; 0
   \end{cases}\]</span></p>
-</section><section id="section-1" class="slide level2">
-<h2></h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tbl_logistic &lt;-<span class="st"> </span><span class="kw">tibble</span>( 
-    <span class="dt">e =</span> <span class="kw">rlogis</span>(sims)
-  , <span class="dt">x =</span> <span class="kw">runif</span>(sims, <span class="op">-</span><span class="dv">10</span>, <span class="dv">10</span>)
-) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">mutate</span>(
-      <span class="dt">latent =</span> b_<span class="dv">0</span> <span class="op">+</span><span class="st"> </span>b_<span class="dv">1</span> <span class="op">*</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>e
-    , <span class="dt">y =</span> <span class="kw">as.integer</span>(latent <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)
-  )</code></pre></div>
-</section><section id="section-2" class="slide level2">
-<h2></h2>
-<p><img src="index_files/figure-revealjs/unnamed-chunk-12-1.png" width="768" /></p>
 </section><section id="section-3" class="slide level2">
 <h2></h2>
-<p><img src="index_files/figure-revealjs/unnamed-chunk-13-1.png" width="768" /></p>
+<p><img src="index_files/figure-revealjs/unnamed-chunk-15-1.png" width="768" /></p>
+</section><section id="how-do-we-fit-this-with-a-linear-model" class="slide level2">
+<h2>How do we fit this with a linear model?</h2>
+<p><span class="math display">\[f(x)=\frac{exp(x)}{exp(x) + 1}\]</span></p>
+<p>So, just take <span class="math inline">\(\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}\)</span> and transform it.</p>
+</section><section id="section-4" class="slide level2">
+<h2></h2>
+<p><img src="index_files/figure-revealjs/unnamed-chunk-16-1.png" width="768" /></p>
+</section><section id="section-5" class="slide level2">
+<h2></h2>
+<pre><code>## 
+## Call:
+## glm(formula = y ~ 1 + x, family = binomial, data = tbl_logistic)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -2.22343   0.00006   0.00175   0.05512   2.81648  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   8.9039     1.1938   7.458 8.76e-14 ***
+## x             1.3079     0.1754   7.458 8.78e-14 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 462.17  on 499  degrees of freedom
+## Residual deviance: 136.97  on 498  degrees of freedom
+## AIC: 140.97
+## 
+## Number of Fisher Scoring iterations: 9</code></pre>
 </section><section id="the-process" class="slide level2">
 <h2>The process</h2>
 <p>So we can use the <strong>same</strong> process to create a logistic regression!</p>
@@ -590,29 +603,81 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li>Observation</li>
 </ol>
 <p>Gaussian and logistic are the only two distributions that I know of where we can get away with this. For other distributions …</p>
-</section><section id="the-process-in-sort-of-reverse" class="slide level2">
-<h2>The process in (sort of) reverse</h2>
-<p>Rather than assuming we start with noise and transform it, let’s start with (a function of) the observation.</p>
+</section><section id="we-dont-really-start-with-noise" class="slide level2">
+<h2>We don’t really start with noise</h2>
+<p>Rather than assuming we start with noise which is transformed, we start with the observation. This is reality.</p>
 <p><span class="math display">\[E[Y_i]=\mu_i=\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}\]</span></p>
-<p>We lost <span class="math inline">\(\epsilon\)</span> !</p>
-<p>But we’re still using maximum likelihood. There’s a distribution in there.</p>
+<p>We lost <span class="math inline">\(\epsilon\)</span>. Early uses of linear models were very focused on this, because <span class="math inline">\(\epsilon\)</span> captured <em>measurement error</em>.</p>
 </section><section id="poisson" class="slide level2">
 <h2>Poisson</h2>
-<p><img src="index_files/figure-revealjs/unnamed-chunk-15-1.png" width="768" /></p>
+<p><img src="index_files/figure-revealjs/unnamed-chunk-20-1.png" width="768" /></p>
+</section><section id="how-do-we-assess-coefficients" class="slide level2">
+<h2>How do we assess coefficients?</h2>
+<p>Earlier, we synthesized data. So, we knew exactly which coefficients generated the observations. Now what?</p>
+</section><section id="for-a-glm" class="slide level2">
+<h2>For a GLM</h2>
+<p><span class="math display">\[\frac{\partial{l(y;\beta)}}{\partial\beta_j}=\sum_{i=1}^n{\frac{(y_i-\mu_i)x_{ij}}{a_i(\phi)b&#39;&#39;(\theta_i)g&#39;(\mu_i)}}\]</span></p>
+</section><section id="poisson-1" class="slide level2">
+<h2>Poisson</h2>
+<p><span class="math display">\[\sum_{i=1}^{n}{(y_i-\mu_i)x_{ij}}\]</span></p>
+<p>BUT</p>
+<p><span class="math display">\[\mu_i=\beta_0+\sum{\beta_jx_{ij}}\]</span></p>
+</section><section id="section-6" class="slide level2">
+<h2></h2>
+<p><span class="math display">\[\sum_{i=1}^{n}{(y_i-\beta_0+\beta_jx_{ij})x_{ij}}\]</span></p>
+</section><section id="does-my-coefficient-explain-my-data" class="slide level2">
+<h2>Does my coefficient explain my data?</h2>
+<pre><code>## 
+## Call:
+## glm(formula = y ~ 1 + x, family = poisson(link = &quot;identity&quot;), 
+##     data = tbl_poisson)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.5839  -0.6812  -0.0013   0.6659   3.7204  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) 10.401128   0.651149   15.97   &lt;2e-16 ***
+## x            1.498033   0.001393 1075.68   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 975066.1  on 4999  degrees of freedom
+## Residual deviance:   4927.3  on 4998  degrees of freedom
+## AIC: 47053
+## 
+## Number of Fisher Scoring iterations: 3</code></pre>
 </section></section>
-<section><section id="speaking-of-maximum-likelihood" class="titleslide slide level1"><h1>Speaking of maximum likelihood</h1></section></section>
-<section><section id="must-we-use-a-distribution" class="titleslide slide level1"><h1>Must we use a distribution?</h1></section><section id="regularization" class="slide level2">
-<h2>Regularization</h2>
-</section><section id="section-4" class="slide level2">
+<section><section id="must-we-use-a-distribution" class="titleslide slide level1"><h1>Must we use a distribution?</h1></section><section id="short-answer" class="slide level2">
+<h2>Short answer</h2>
+<ul>
+<li class="fragment">No</li>
+</ul>
+</section><section id="long-answer" class="slide level2">
+<h2>Long answer</h2>
+<p>Gauss, Galton and Legendre were (mostly) uninterested in presuming a functional form <span class="math inline">\(\therefore\)</span> least squares estimation.</p>
+<p>Compare with Buhlmann and origins of credibility.</p>
+</section><section id="regularization---lasso" class="slide level2">
+<h2>Regularization - Lasso</h2>
+<p><span class="math display">\[RSS(\lambda, c)=\sum_{i=1}^n{(y_i-\hat{y_i})^2}+\lambda\sum_{j=1}^p{|c_j|}\]</span></p>
+<p>Lasso -</p>
+</section><section id="ridge" class="slide level2">
+<h2>Ridge</h2>
+<p><span class="math display">\[RSS(\lambda, c)=\sum_{i=1}^n{(y_i-\hat{y_i})^2}+\lambda\sum_{j=1}^p{c_j^2}\]</span></p>
+</section><section id="section-7" class="slide level2">
 <h2></h2>
 <ul>
 <li>Ridges reduces</li>
 <li>Lasso liminates</li>
 </ul>
 </section></section>
-<section><section id="all-the-other-stuff-i-didnt-cover" class="titleslide slide level1"><h1>All the other stuff I didn’t cover</h1></section><section id="theres-so-much-more" class="slide level2">
-<h2>There’s so much more!</h2>
+<section><section id="wrapping-up" class="titleslide slide level1"><h1>Wrapping up</h1></section><section id="all-the-other-stuff-i-didnt-mention" class="slide level2">
+<h2>All the other stuff I didn’t mention</h2>
 <ul>
+<li><strong>Hierearchical Models!!</strong></li>
 <li>Data pre-processing
 <ul>
 <li>Polynomial</li>
@@ -620,9 +685,11 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li>Centering</li>
 <li>Other</li>
 </ul></li>
+<li>Time series</li>
+<li>Heteroskedasticity</li>
+<li>Stochastic coefficients –&gt; Chain Ladder loss reserving!!</li>
 </ul>
-</section></section>
-<section><section id="wrapping-up" class="titleslide slide level1"><h1>Wrapping up</h1></section><section id="what-do-these-things-have-in-common-1" class="slide level2">
+</section><section id="what-do-these-things-have-in-common-1" class="slide level2">
 <h2>What do these things have in common?</h2>
 <ul>
 <li>Amy Winehouse - Rehab</li>
@@ -655,24 +722,15 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li>Regularization</li>
 <li>Lasso</li>
 </ul>
-</section><section id="section-5" class="slide level2">
+</section><section id="section-8" class="slide level2">
 <h2></h2>
 <p><span class="math display">\[\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}\]</span></p>
 </section><section id="what-do-these-things-have-in-common-3" class="slide level2">
 <h2>What do these things have in common?</h2>
 <ul>
-<li>Distributional assumption</li>
 <li>Linear combination of (transformed) predictors</li>
-<li>Performance assessment of predictors
-<ul>
-<li>Hypothesis tests</li>
-<li>Stepwise regression</li>
-<li></li>
-</ul></li>
-<li>Tests of model fit
-<ul>
-<li>AIC</li>
-</ul></li>
+<li>Distributional assumption</li>
+<li>Performance assessment of predictors</li>
 <li>Testable statistical hypotheses
 <ul>
 <li>Distributional form</li>
@@ -681,11 +739,6 @@ document.getElementsByTagName('head')[0].appendChild(style);
 </ul></li>
 <li>Assessment of residuals</li>
 </ul>
-</section><section id="section-6" class="slide level2">
-<h2></h2>
-<blockquote>
-<p>“…magical dreamlike logic”</p>
-</blockquote>
 </section><section id="thank-you" class="slide level2">
 <h2>Thank you!</h2>
 </section><section id="references" class="slide level2">
@@ -694,6 +747,9 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <li>pirategrunt.com/linear_blues/</li>
 <li><a href="https://musiciantuts.com/12-bar-blues-songs/" class="uri">https://musiciantuts.com/12-bar-blues-songs/</a></li>
 <li><a href="http://the12barbluesaframework.blogspot.com/2009/04/introduction-to-12-bar-blues.html" class="uri">http://the12barbluesaframework.blogspot.com/2009/04/introduction-to-12-bar-blues.html</a></li>
+<li>McCullough and Nelder</li>
+<li>Curtis Gary Dean</li>
+<li>R in a Nutshell</li>
 </ul>
 </section></section>
     </div>
