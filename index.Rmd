@@ -151,7 +151,7 @@ sims <- 500
 b_0 <- 10
 b_1 <- 1.5
 tbl_linear <- tibble(
-    x = runif(sims, 10, 20)
+    x = runif(sims, -10, 10)
   , e = rnorm(sims, 0, 2) 
 ) %>% 
   mutate(
@@ -255,19 +255,17 @@ $$y_i =
 ##
 
 ```{r echo=FALSE}
-tbl_logistic <- tibble( 
-    e = rlogis(sims)
-  , x = runif(sims, -10, 10)
-) %>% 
-  mutate(
-      latent = b_0 + b_1 * x + e
-    , y = as.integer(latent > 0)
+tbl_linear <- tbl_linear %>% 
+  mutate( 
+      e_logis = rlogis(sims)
+    , latent = b_0 + b_1 * x + e
+    , y_logis = as.integer(latent > 0)
   )
 ```
 
 ```{r }
-tbl_logistic %>% 
-  ggplot(aes(x, y)) + 
+tbl_linear %>% 
+  ggplot(aes(x, y_logis)) + 
   geom_point()
 ```
 
@@ -280,24 +278,22 @@ So, just take $\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}$ and transform it.
 ##
 
 ```{r }
-tbl_logistic %>% 
-  ggplot(aes(x, y)) + 
+tbl_linear %>% 
+  ggplot(aes(x, y_logis)) + 
   geom_point() + 
   geom_smooth(method = glm,  method.args = list(family = "binomial"))
 ```
 
 ##
 
-```{r}
+```{r echo=TRUE}
 fit_logistic <- glm(
-  y ~ 1 + x
-  , data = tbl_logistic
+    y_logis ~ 1 + x
+  , data = tbl_linear
   , family = binomial
 )
-```
 
-```{r }
-summary(fit_logistic)
+coef(fit_logistic)
 ```
 
 ## The process
@@ -317,18 +313,18 @@ Rather than assuming we start with noise which is transformed, we start with the
 
 $$E[Y_i]=\mu_i=\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}$$
 
-We lost $\epsilon$. Early uses of linear models were very focused on this, because $\epsilon$ captured _measurement error_.
+We lost $\epsilon$. Early uses of linear models were very focused on this, because $\epsilon$ captured _measurement error_. Later uses were focused on _probability distributions_.
 
 ## Poisson
 
 ```{r}
-sims <- 5e3
+sims_poisson <- 5e3
 tbl_poisson <- tibble(
-  x = sample(100:1000, size = sims, replace = TRUE)
+  x = sample(100:1000, size = sims_poisson, replace = TRUE)
 ) %>% 
   mutate(
       eta = b_0 + b_1 * x 
-    , y = rpois(sims, eta)
+    , y = rpois(sims_poisson, eta)
   )
 ```
 
@@ -344,27 +340,140 @@ Earlier, we synthesized data. So, we knew exactly which coefficients generated t
 
 ## For a GLM
 
+<div class='big-math'>
 $$\frac{\partial{l(y;\beta)}}{\partial\beta_j}=\sum_{i=1}^n{\frac{(y_i-\mu_i)x_{ij}}{a_i(\phi)b''(\theta_i)g'(\mu_i)}}$$
+</div>
 
 ## Poisson
-
+<div class='big-math'>
 $$\sum_{i=1}^{n}{(y_i-\mu_i)x_{ij}}$$
+</div>
 
 BUT
 
+<div class='big-math'>
 $$\mu_i=\beta_0+\sum{\beta_jx_{ij}}$$
+</div>
 
-## 
+## Poisson
 
 $$\sum_{i=1}^{n}{(y_i-\beta_0+\beta_jx_{ij})x_{ij}}$$
 
 ## Does my coefficient explain my data?
 
 ```{r}
-fit <- glm(y ~ 1 + x, data = tbl_poisson, family=poisson(link='identity'))
-summary(fit)
+fit_poisson <- glm(y ~ 1 + x, data = tbl_poisson, family = poisson(link = 'identity'))
+summary(fit_poisson)
 ```
 
+## Coefficient significance
+
+* Actually, just testing if the coefficient is different than zero
+* Regressing cumulative loss against prior cumulative, coefficients are _always_ significant
+
+## Reserves
+
+```{r}
+library(raw)
+data("comauto")
+
+tbl_reserve <- comauto %>% 
+  filter(DevelopmentYear < 1997) %>% 
+  group_by(Company, AccidentYear) %>% 
+  arrange(Lag, .by_group = TRUE) %>% 
+  ungroup() %>% 
+  mutate(
+      PriorPaid = dplyr::lag(CumulativePaid)
+    , IncrementalPaid = CumulativePaid - PriorPaid
+  ) %>% 
+  filter(Lag != 1) %>% 
+  mutate(LagFactor = as.factor(Lag))
+
+fit_reserves <- lm(
+    CumulativePaid ~ 0 + PriorPaid:LagFactor
+  , data = tbl_reserve
+)
+
+summary(fit_reserves)
+```
+
+## Reserves
+
+```{r}
+fit_reserves_inc <- lm(
+    IncrementalPaid ~ 0 + PriorPaid:LagFactor
+  , data = tbl_reserve
+)
+summary(fit_reserves_inc)
+```
+
+## Coefficient significance
+
+```{r echo = TRUE}
+tbl_linear <- tbl_linear %>% 
+  mutate(
+      exposure = x + rnorm(sims)
+    , olep = exposure + rnorm(sims)
+    , ep = olep + rnorm(sims)
+  )
+```
+
+## Fit exposure
+
+```{r}
+fit_exposure <- lm(
+  y ~ 1 + exposure
+  , data = tbl_linear
+)
+summary(fit_exposure)
+```
+
+## Fit olep
+
+```{r}
+fit_olep <- lm(
+    y ~ 1 + olep
+  , data = tbl_linear
+)
+summary(fit_olep)
+```
+
+## Fit ep
+
+```{r}
+fit_ep <- lm(
+    y ~ 1 + ep
+  , data = tbl_linear
+)
+summary(fit_ep)
+```
+
+## Coefficient significance
+
+When we don't know where the observation came from, maximum likelihood lets us reason about potential origins.
+
+Maximum likelihood also lets us know what we don't know.
+
+## Deviance
+
+Deviance is twice the log-likelihood
+
+```{r}
+summary(fit_poisson)
+```
+
+##
+
+```{r}
+tbl_poisson <- tbl_poisson %>% 
+  mutate(noise = rnorm(sims_poisson, 0, 10))
+
+fit_poisson_2 <- glm(
+    y ~ 1 + noise
+  , data = tbl_poisson
+  , family = poisson(link = 'identity'))
+summary(fit_poisson_2)
+```
 
 # Must we use a distribution?
 
@@ -380,13 +489,13 @@ Compare with Buhlmann and origins of credibility.
 
 ## Regularization - Lasso
 
-$$RSS(\lambda, c)=\sum_{i=1}^n{(y_i-\hat{y_i})^2}+\lambda\sum_{j=1}^p{|c_j|}$$
+$$RSS(\lambda, c)=\sum_{i=1}^n{(y_i-\hat{y_i})^2}+\lambda\sum_{j=1}^p{|\beta_j|}$$
 
 Lasso - 
 
 ## Ridge
 
-$$RSS(\lambda, c)=\sum_{i=1}^n{(y_i-\hat{y_i})^2}+\lambda\sum_{j=1}^p{c_j^2}$$
+$$RSS(\lambda, c)=\sum_{i=1}^n{(y_i-\hat{y_i})^2}+\lambda\sum_{j=1}^p{\beta_j^2}$$
 
 ##
 
@@ -443,7 +552,7 @@ $$\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}$$
 ## What do these things have in common?
 
 * Linear combination of (transformed) predictors
-* Distributional assumption
+* Distributional assumption (most of the time)
 * Performance assessment of predictors
 * Testable statistical hypotheses
     * Distributional form

@@ -10,6 +10,43 @@
   <link rel="stylesheet" href="index_files/reveal.js-3.3.0.1/css/reveal.css"/>
 
 
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 <link rel="stylesheet" href="index_files/reveal.js-3.3.0.1/css/theme/solarized.css" id="theme">
 
@@ -517,14 +554,14 @@ document.getElementsByTagName('head')[0].appendChild(style);
 </section><section id="determine" class="slide level2">
 <h2>Determine</h2>
 <pre><code>## $par
-## [1] 9.910613 1.508896
+## [1] 10.043945  1.504369
 ## 
 ## $value
 ## [1] 4.034552
 ## 
 ## $counts
 ## function gradient 
-##       51       NA 
+##       61       NA 
 ## 
 ## $convergence
 ## [1] 0
@@ -571,28 +608,15 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <p><img src="index_files/figure-revealjs/unnamed-chunk-16-1.png" width="768" /></p>
 </section><section id="section-5" class="slide level2">
 <h2></h2>
-<pre><code>## 
-## Call:
-## glm(formula = y ~ 1 + x, family = binomial, data = tbl_logistic)
-## 
-## Deviance Residuals: 
-##      Min        1Q    Median        3Q       Max  
-## -2.22343   0.00006   0.00175   0.05512   2.81648  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)   8.9039     1.1938   7.458 8.76e-14 ***
-## x             1.3079     0.1754   7.458 8.78e-14 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 462.17  on 499  degrees of freedom
-## Residual deviance: 136.97  on 498  degrees of freedom
-## AIC: 140.97
-## 
-## Number of Fisher Scoring iterations: 9</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit_logistic &lt;-<span class="st"> </span><span class="kw">glm</span>(
+    y_logis <span class="op">~</span><span class="st"> </span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span>x
+  , <span class="dt">data =</span> tbl_linear
+  , <span class="dt">family =</span> binomial
+)
+
+<span class="kw">coef</span>(fit_logistic)</code></pre></div>
+<pre><code>## (Intercept)           x 
+##    9.512640    1.441614</code></pre>
 </section><section id="the-process" class="slide level2">
 <h2>The process</h2>
 <p>So we can use the <strong>same</strong> process to create a logistic regression!</p>
@@ -607,23 +631,29 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <h2>We don’t really start with noise</h2>
 <p>Rather than assuming we start with noise which is transformed, we start with the observation. This is reality.</p>
 <p><span class="math display">\[E[Y_i]=\mu_i=\beta_0 + \sum_{j=1}^{p}{\beta_j * x_{ij}}\]</span></p>
-<p>We lost <span class="math inline">\(\epsilon\)</span>. Early uses of linear models were very focused on this, because <span class="math inline">\(\epsilon\)</span> captured <em>measurement error</em>.</p>
+<p>We lost <span class="math inline">\(\epsilon\)</span>. Early uses of linear models were very focused on this, because <span class="math inline">\(\epsilon\)</span> captured <em>measurement error</em>. Later uses were focused on <em>probability distributions</em>.</p>
 </section><section id="poisson" class="slide level2">
 <h2>Poisson</h2>
-<p><img src="index_files/figure-revealjs/unnamed-chunk-20-1.png" width="768" /></p>
+<p><img src="index_files/figure-revealjs/unnamed-chunk-19-1.png" width="768" /></p>
 </section><section id="how-do-we-assess-coefficients" class="slide level2">
 <h2>How do we assess coefficients?</h2>
 <p>Earlier, we synthesized data. So, we knew exactly which coefficients generated the observations. Now what?</p>
 </section><section id="for-a-glm" class="slide level2">
 <h2>For a GLM</h2>
+<div class="big-math">
 <p><span class="math display">\[\frac{\partial{l(y;\beta)}}{\partial\beta_j}=\sum_{i=1}^n{\frac{(y_i-\mu_i)x_{ij}}{a_i(\phi)b&#39;&#39;(\theta_i)g&#39;(\mu_i)}}\]</span></p>
+</div>
 </section><section id="poisson-1" class="slide level2">
 <h2>Poisson</h2>
+<div class="big-math">
 <p><span class="math display">\[\sum_{i=1}^{n}{(y_i-\mu_i)x_{ij}}\]</span></p>
+</div>
 <p>BUT</p>
+<div class="big-math">
 <p><span class="math display">\[\mu_i=\beta_0+\sum{\beta_jx_{ij}}\]</span></p>
-</section><section id="section-6" class="slide level2">
-<h2></h2>
+</div>
+</section><section id="poisson-2" class="slide level2">
+<h2>Poisson</h2>
 <p><span class="math display">\[\sum_{i=1}^{n}{(y_i-\beta_0+\beta_jx_{ij})x_{ij}}\]</span></p>
 </section><section id="does-my-coefficient-explain-my-data" class="slide level2">
 <h2>Does my coefficient explain my data?</h2>
@@ -634,22 +664,203 @@ document.getElementsByTagName('head')[0].appendChild(style);
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -3.5839  -0.6812  -0.0013   0.6659   3.7204  
+## -3.5790  -0.6748   0.0016   0.6696   3.7722  
 ## 
 ## Coefficients:
-##              Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept) 10.401128   0.651149   15.97   &lt;2e-16 ***
-## x            1.498033   0.001393 1075.68   &lt;2e-16 ***
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) 9.421886   0.646435   14.57   &lt;2e-16 ***
+## x           1.500445   0.001389 1080.59   &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## (Dispersion parameter for poisson family taken to be 1)
 ## 
-##     Null deviance: 975066.1  on 4999  degrees of freedom
-## Residual deviance:   4927.3  on 4998  degrees of freedom
-## AIC: 47053
+##     Null deviance: 984804.4  on 4999  degrees of freedom
+## Residual deviance:   4896.6  on 4998  degrees of freedom
+## AIC: 47004
 ## 
 ## Number of Fisher Scoring iterations: 3</code></pre>
+</section><section id="coefficient-significance" class="slide level2">
+<h2>Coefficient significance</h2>
+<ul>
+<li>Actually, just testing if the coefficient is different than zero</li>
+<li>Regressing cumulative loss against prior cumulative, coefficients are <em>always</em> significant</li>
+</ul>
+</section><section id="reserves" class="slide level2">
+<h2>Reserves</h2>
+<pre><code>## 
+## Call:
+## lm(formula = CumulativePaid ~ 0 + PriorPaid:LagFactor, data = tbl_reserve)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -10797.5    -14.1      0.0      5.2  31257.5 
+## 
+## Coefficients:
+##                      Estimate Std. Error t value Pr(&gt;|t|)    
+## PriorPaid:LagFactor2 1.962185   0.004020   488.1   &lt;2e-16 ***
+## PriorPaid:LagFactor3 1.300218   0.002232   582.5   &lt;2e-16 ***
+## PriorPaid:LagFactor4 1.148710   0.001905   603.1   &lt;2e-16 ***
+## PriorPaid:LagFactor5 1.074151   0.001863   576.6   &lt;2e-16 ***
+## PriorPaid:LagFactor6 1.038104   0.001963   528.8   &lt;2e-16 ***
+## PriorPaid:LagFactor7 1.018473   0.002196   463.7   &lt;2e-16 ***
+## PriorPaid:LagFactor8 1.010193   0.002767   365.1   &lt;2e-16 ***
+## PriorPaid:LagFactor9 1.003911   0.003972   252.7   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 858.8 on 5680 degrees of freedom
+## Multiple R-squared:  0.9971, Adjusted R-squared:  0.9971 
+## F-statistic: 2.457e+05 on 8 and 5680 DF,  p-value: &lt; 2.2e-16</code></pre>
+</section><section id="reserves-1" class="slide level2">
+<h2>Reserves</h2>
+<pre><code>## 
+## Call:
+## lm(formula = IncrementalPaid ~ 0 + PriorPaid:LagFactor, data = tbl_reserve)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -10797.5    -14.1      0.0      5.2  31257.5 
+## 
+## Coefficients:
+##                      Estimate Std. Error t value Pr(&gt;|t|)    
+## PriorPaid:LagFactor2 0.962185   0.004020 239.365  &lt; 2e-16 ***
+## PriorPaid:LagFactor3 0.300218   0.002232 134.501  &lt; 2e-16 ***
+## PriorPaid:LagFactor4 0.148710   0.001905  78.080  &lt; 2e-16 ***
+## PriorPaid:LagFactor5 0.074151   0.001863  39.807  &lt; 2e-16 ***
+## PriorPaid:LagFactor6 0.038104   0.001963  19.408  &lt; 2e-16 ***
+## PriorPaid:LagFactor7 0.018473   0.002196   8.410  &lt; 2e-16 ***
+## PriorPaid:LagFactor8 0.010193   0.002767   3.684 0.000232 ***
+## PriorPaid:LagFactor9 0.003911   0.003972   0.985 0.324831    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 858.8 on 5680 degrees of freedom
+## Multiple R-squared:  0.9363, Adjusted R-squared:  0.9362 
+## F-statistic: 1.044e+04 on 8 and 5680 DF,  p-value: &lt; 2.2e-16</code></pre>
+</section><section id="coefficient-significance-1" class="slide level2">
+<h2>Coefficient significance</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tbl_linear &lt;-<span class="st"> </span>tbl_linear <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(
+      <span class="dt">exposure =</span> x <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(sims)
+    , <span class="dt">olep =</span> exposure <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(sims)
+    , <span class="dt">ep =</span> olep <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(sims)
+  )</code></pre></div>
+</section><section id="fit-exposure" class="slide level2">
+<h2>Fit exposure</h2>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ 1 + exposure, data = tbl_linear)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7.9028 -1.5781 -0.0028  1.7441  6.3470 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 10.18518    0.11376   89.53   &lt;2e-16 ***
+## exposure     1.44976    0.01961   73.95   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.542 on 498 degrees of freedom
+## Multiple R-squared:  0.9165, Adjusted R-squared:  0.9164 
+## F-statistic:  5468 on 1 and 498 DF,  p-value: &lt; 2.2e-16</code></pre>
+</section><section id="fit-olep" class="slide level2">
+<h2>Fit olep</h2>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ 1 + olep, data = tbl_linear)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -9.3303 -2.0551 -0.0487  1.9376  7.0604 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 10.20152    0.12593   81.01   &lt;2e-16 ***
+## olep         1.41852    0.02145   66.12   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.814 on 498 degrees of freedom
+## Multiple R-squared:  0.8977, Adjusted R-squared:  0.8975 
+## F-statistic:  4371 on 1 and 498 DF,  p-value: &lt; 2.2e-16</code></pre>
+</section><section id="fit-ep" class="slide level2">
+<h2>Fit ep</h2>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ 1 + ep, data = tbl_linear)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -10.5280  -2.0471  -0.0232   2.2744   8.9196 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 10.16986    0.14352   70.86   &lt;2e-16 ***
+## ep           1.39278    0.02443   57.01   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.207 on 498 degrees of freedom
+## Multiple R-squared:  0.8671, Adjusted R-squared:  0.8669 
+## F-statistic:  3250 on 1 and 498 DF,  p-value: &lt; 2.2e-16</code></pre>
+</section><section id="coefficient-significance-2" class="slide level2">
+<h2>Coefficient significance</h2>
+<p>When we don’t know where the observation came from, maximum likelihood lets us reason about potential origins.</p>
+<p>Maximum likelihood also lets us know what we don’t know.</p>
+</section><section id="deviance" class="slide level2">
+<h2>Deviance</h2>
+<p>Deviance is twice the log-likelihood</p>
+<pre><code>## 
+## Call:
+## glm(formula = y ~ 1 + x, family = poisson(link = &quot;identity&quot;), 
+##     data = tbl_poisson)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.5790  -0.6748   0.0016   0.6696   3.7722  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) 9.421886   0.646435   14.57   &lt;2e-16 ***
+## x           1.500445   0.001389 1080.59   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 984804.4  on 4999  degrees of freedom
+## Residual deviance:   4896.6  on 4998  degrees of freedom
+## AIC: 47004
+## 
+## Number of Fisher Scoring iterations: 3</code></pre>
+</section><section id="section-6" class="slide level2">
+<h2></h2>
+<pre><code>## 
+## Call:
+## glm(formula = y ~ 1 + noise, family = poisson(link = &quot;identity&quot;), 
+##     data = tbl_poisson)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -30.4294  -12.4831   -0.3401   10.9409   22.9469  
+## 
+## Coefficients:
+##              Estimate Std. Error  z value Pr(&gt;|z|)    
+## (Intercept) 832.83733    0.40815 2040.500  &lt; 2e-16 ***
+## noise        -0.17073    0.04064   -4.201 2.66e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 984804  on 4999  degrees of freedom
+## Residual deviance: 984786  on 4998  degrees of freedom
+## AIC: 1026894
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
 </section></section>
 <section><section id="must-we-use-a-distribution" class="titleslide slide level1"><h1>Must we use a distribution?</h1></section><section id="short-answer" class="slide level2">
 <h2>Short answer</h2>
@@ -662,11 +873,11 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <p>Compare with Buhlmann and origins of credibility.</p>
 </section><section id="regularization---lasso" class="slide level2">
 <h2>Regularization - Lasso</h2>
-<p><span class="math display">\[RSS(\lambda, c)=\sum_{i=1}^n{(y_i-\hat{y_i})^2}+\lambda\sum_{j=1}^p{|c_j|}\]</span></p>
+<p><span class="math display">\[RSS(\lambda, c)=\sum_{i=1}^n{(y_i-\hat{y_i})^2}+\lambda\sum_{j=1}^p{|\beta_j|}\]</span></p>
 <p>Lasso -</p>
 </section><section id="ridge" class="slide level2">
 <h2>Ridge</h2>
-<p><span class="math display">\[RSS(\lambda, c)=\sum_{i=1}^n{(y_i-\hat{y_i})^2}+\lambda\sum_{j=1}^p{c_j^2}\]</span></p>
+<p><span class="math display">\[RSS(\lambda, c)=\sum_{i=1}^n{(y_i-\hat{y_i})^2}+\lambda\sum_{j=1}^p{\beta_j^2}\]</span></p>
 </section><section id="section-7" class="slide level2">
 <h2></h2>
 <ul>

@@ -51,7 +51,7 @@ sims <- 500
 b_0 <- 10
 b_1 <- 1.5
 tbl_linear <- tibble(
-    x = runif(sims, 10, 20)
+    x = runif(sims, -10, 10)
   , e = rnorm(sims, 0, 2) 
 ) %>% 
   mutate(
@@ -99,37 +99,92 @@ tbl_linear %>%
 tbl_linear %>% 
   ggplot(aes(x, y_adj)) + 
   geom_point()
-tbl_logistic <- tibble( 
-    e = rlogis(sims)
-  , x = runif(sims, -10, 10)
-) %>% 
-  mutate(
-      latent = b_0 + b_1 * x + e
-    , y = as.integer(latent > 0)
+tbl_linear <- tbl_linear %>% 
+  mutate( 
+      e_logis = rlogis(sims)
+    , latent = b_0 + b_1 * x + e
+    , y_logis = as.integer(latent > 0)
   )
-tbl_logistic %>% 
-  ggplot(aes(x, y)) + 
+tbl_linear %>% 
+  ggplot(aes(x, y_logis)) + 
   geom_point()
-tbl_logistic %>% 
-  ggplot(aes(x, y)) + 
+tbl_linear %>% 
+  ggplot(aes(x, y_logis)) + 
   geom_point() + 
   geom_smooth(method = glm,  method.args = list(family = "binomial"))
 fit_logistic <- glm(
-  y ~ 1 + x
-  , data = tbl_logistic
+    y_logis ~ 1 + x
+  , data = tbl_linear
   , family = binomial
 )
-summary(fit_logistic)
-sims <- 5e3
+
+coef(fit_logistic)
+sims_poisson <- 5e3
 tbl_poisson <- tibble(
-  x = sample(100:1000, size = sims, replace = TRUE)
+  x = sample(100:1000, size = sims_poisson, replace = TRUE)
 ) %>% 
   mutate(
       eta = b_0 + b_1 * x 
-    , y = rpois(sims, eta)
+    , y = rpois(sims_poisson, eta)
   )
 tbl_poisson %>% 
   ggplot(aes(x, y)) +
   geom_hex()
-fit <- glm(y ~ 1 + x, data = tbl_poisson, family=poisson(link='identity'))
-summary(fit)
+fit_poisson <- glm(y ~ 1 + x, data = tbl_poisson, family = poisson(link = 'identity'))
+summary(fit_poisson)
+library(raw)
+data("comauto")
+
+tbl_reserve <- comauto %>% 
+  filter(DevelopmentYear < 1997) %>% 
+  group_by(Company, AccidentYear) %>% 
+  arrange(Lag, .by_group = TRUE) %>% 
+  ungroup() %>% 
+  mutate(
+      PriorPaid = dplyr::lag(CumulativePaid)
+    , IncrementalPaid = CumulativePaid - PriorPaid
+  ) %>% 
+  filter(Lag != 1) %>% 
+  mutate(LagFactor = as.factor(Lag))
+
+fit_reserves <- lm(
+    CumulativePaid ~ 0 + PriorPaid:LagFactor
+  , data = tbl_reserve
+)
+
+summary(fit_reserves)
+fit_reserves_inc <- lm(
+    IncrementalPaid ~ 0 + PriorPaid:LagFactor
+  , data = tbl_reserve
+)
+summary(fit_reserves_inc)
+tbl_linear <- tbl_linear %>% 
+  mutate(
+      exposure = x + rnorm(sims)
+    , olep = exposure + rnorm(sims)
+    , ep = olep + rnorm(sims)
+  )
+fit_exposure <- lm(
+  y ~ 1 + exposure
+  , data = tbl_linear
+)
+summary(fit_exposure)
+fit_olep <- lm(
+    y ~ 1 + olep
+  , data = tbl_linear
+)
+summary(fit_olep)
+fit_ep <- lm(
+    y ~ 1 + ep
+  , data = tbl_linear
+)
+summary(fit_ep)
+summary(fit_poisson)
+tbl_poisson <- tbl_poisson %>% 
+  mutate(noise = rnorm(sims_poisson, 0, 10))
+
+fit_poisson_2 <- glm(
+    y ~ 1 + noise
+  , data = tbl_poisson
+  , family = poisson(link = 'identity'))
+summary(fit_poisson_2)
